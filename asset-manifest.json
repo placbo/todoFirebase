@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/todoFirebase/static/css/main.89c36d80.chunk.css",
+    "main.js": "/todoFirebase/static/js/main.ec2a6cf1.chunk.js",
+    "main.js.map": "/todoFirebase/static/js/main.ec2a6cf1.chunk.js.map",
+    "runtime-main.js": "/todoFirebase/static/js/runtime-main.739cc82c.js",
+    "runtime-main.js.map": "/todoFirebase/static/js/runtime-main.739cc82c.js.map",
+    "static/js/2.50713337.chunk.js": "/todoFirebase/static/js/2.50713337.chunk.js",
+    "static/js/2.50713337.chunk.js.map": "/todoFirebase/static/js/2.50713337.chunk.js.map",
+    "index.html": "/todoFirebase/index.html",
+    "precache-manifest.4bcabbf09275ec3649c7805537c2f3ad.js": "/todoFirebase/precache-manifest.4bcabbf09275ec3649c7805537c2f3ad.js",
+    "service-worker.js": "/todoFirebase/service-worker.js",
+    "static/css/main.89c36d80.chunk.css.map": "/todoFirebase/static/css/main.89c36d80.chunk.css.map",
+    "static/js/2.50713337.chunk.js.LICENSE.txt": "/todoFirebase/static/js/2.50713337.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.739cc82c.js",
+    "static/js/2.50713337.chunk.js",
+    "static/css/main.89c36d80.chunk.css",
+    "static/js/main.ec2a6cf1.chunk.js"
+  ]
+}
