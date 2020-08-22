@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import app from "./firebase";
 import firebase from "./firebase";
 import {AuthContext} from "./Auth";
+import {getTodoForUser, setTodoForUser} from "./api";
 
 function MainPage() {
     const [newItemTitle, setNewItemTitle] = useState("");
@@ -11,13 +12,9 @@ function MainPage() {
 
     useEffect(() => {
         setWaitForApi(true);
-        firebase
-            .firestore()
-            .collection("todoLists")
-            .doc(currentUser.email)
-            .get()
-            .then((doc) => {
-                setItems(doc.data().tasks);
+        getTodoForUser(currentUser.email)
+            .then((items) => {
+                setItems(items);
             })
             .catch((error) => {
                 console.log("fail to load todoList", error)
@@ -34,17 +31,7 @@ function MainPage() {
         setItems(data);
         //TODO: useEffect på items -> lagre når items er endret
         setNewItemTitle("");
-        firebase
-            .firestore()
-            .collection("todoLists")
-            .doc(currentUser.email)
-            .set({tasks: data})
-            .then(() => {
-                console.log("Document successfully written!");
-            })
-            .catch((error) => {
-                console.error("Error updating/creating document: ", error);
-            });
+        setTodoForUser(currentUser.email,data);
     };
 
     const deleteItem = (index, e) => {
@@ -52,17 +39,8 @@ function MainPage() {
         items.splice(index, 1)
         //setItems(items.slice());
         setItems([...items]); //TODO: forstå denne
-        firebase
-            .firestore()
-            .collection("todoLists")
-            .doc(currentUser.email)
-            .set({tasks: items})
-            .then(() => {
-                console.log("Document successfully written!");
-            })
-            .catch((error) => {
-                console.error("Error updating/creating document: ", error);
-            });
+        setTodoForUser(currentUser.email,items);
+
     }
 
     return (
