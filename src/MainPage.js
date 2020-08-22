@@ -37,7 +37,7 @@ function MainPage() {
             .collection("todoLists")
             .doc(currentUser.email)
             .set({tasks: data})
-            .then((docRef) => {
+            .then(() => {
                 console.log("Document successfully written!");
             })
             .catch((error) => {
