@@ -32,6 +32,8 @@ function MainPage() {
         let newItem = {"itemTitle": newItemTitle};
         let data = [...items, newItem];
         setItems(data);
+        //TODO: useEffect på items -> lagre når items er endret
+        setNewItemTitle("");
         firebase
             .firestore()
             .collection("todoLists")
@@ -44,6 +46,24 @@ function MainPage() {
                 console.error("Error updating/creating document: ", error);
             });
     };
+
+    const deleteItem = (index, e) => {
+        e.preventDefault();
+        items.splice(index, 1)
+        //setItems(items.slice());
+        setItems([...items]); //TODO: forstå denne
+        firebase
+            .firestore()
+            .collection("todoLists")
+            .doc(currentUser.email)
+            .set({tasks: items})
+            .then(() => {
+                console.log("Document successfully written!");
+            })
+            .catch((error) => {
+                console.error("Error updating/creating document: ", error);
+            });
+    }
 
     return (
         <div className="App">
@@ -58,11 +78,13 @@ function MainPage() {
                     value={newItemTitle}
                     onChange={(e) => setNewItemTitle(e.currentTarget.value)}
                 />
-                <button>Add</button>
+                <button disabled={newItemTitle.length === 0}>Add</button>
             </form>
             {waitForApi && (<h1>fetching data ...</h1>)}
             {items &&
-            items.map((item, index) => <li key={index}>{item.itemTitle}</li>)}
+            items.map((item, index) => <li key={index}>{item.itemTitle}
+                <button onClick={(e) => deleteItem(index, e)}>Slett</button>
+            </li>)}
 
             <button onClick={() => app.auth().signOut()}>Sign out</button>
         </div>
