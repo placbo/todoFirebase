@@ -8,10 +8,16 @@ export const AuthProvider = ({children}) => {
     const [pending, setPending] = useState(true);
 
     useEffect(() => {
-        app.auth().onAuthStateChanged((user) => {
-            setCurrentUser(user)
+        if (process.env.REACT_APP_USE_MOCK) {
+            setCurrentUser({email:"MOCKUSER"})
             setPending(false)
-        });
+        }
+        else {
+            app.auth().onAuthStateChanged((user) => {
+                setCurrentUser(user)
+                setPending(false)
+            });
+        }
     }, []);
 
     if (pending) {

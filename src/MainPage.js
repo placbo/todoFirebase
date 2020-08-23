@@ -2,6 +2,8 @@ import React, {useContext, useEffect, useState} from "react";
 import app from "./firebase";
 import {AuthContext} from "./Auth";
 import {getTodoForUser, setTodoForUser} from "./api";
+import Checkbox from "@material-ui/core/Checkbox";
+import {Favorite, FavoriteBorder} from "@material-ui/icons";
 
 function MainPage() {
     const [newItemTitle, setNewItemTitle] = useState("");
@@ -10,6 +12,7 @@ function MainPage() {
     const {currentUser} = useContext(AuthContext);
     const [allChangesSaved, setAllChangesSaved] = useState(true);
 
+    //Trigger (get list) on logged in user
     useEffect(() => {
         setWaitForApi(true);
         getTodoForUser(currentUser.email)
@@ -17,7 +20,7 @@ function MainPage() {
                 setItems(items);
             })
             .catch((error) => {
-                console.log("fail to load todoList", error)
+                console.log("Failed to load todo-list", error)
             })
             .finally(() => {
                 setWaitForApi(false);
@@ -25,13 +28,13 @@ function MainPage() {
     }, [currentUser.email]);
 
 
+    //Trigger (save list) on list change
     useEffect(() => {
         if (!allChangesSaved) {
             setTodoForUser(currentUser.email,items);
             setAllChangesSaved(true);
         }
     }, [items, allChangesSaved, currentUser.email]);
-
 
     const addItem = (e) => {
         e.preventDefault();
@@ -66,9 +69,13 @@ function MainPage() {
             </form>
             {waitForApi && (<h1>fetching data ...</h1>)}
             {items &&
-            items.map((item, index) => <li key={index}>{item.itemTitle}
+            items.map((item, index) =>
+            <li key={index}>
+                <Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} name="checked" />
+                {item.itemTitle}
                 <button onClick={(e) => deleteItem(index, e)}>Slett</button>
-            </li>)}
+            </li>
+            )}
 
             <button onClick={() => app.auth().signOut()}>Sign out</button>
         </div>
