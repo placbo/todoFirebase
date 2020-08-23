@@ -1,9 +1,31 @@
 import React, {useContext, useEffect, useState} from "react";
-import app from "./firebase";
-import {AuthContext} from "./Auth";
+import {AuthContext, AuthProvider} from "./Auth";
 import {getTodoForUser, setTodoForUser} from "./api";
 import Checkbox from "@material-ui/core/Checkbox";
 import {Favorite, FavoriteBorder} from "@material-ui/icons";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from "@material-ui/core/IconButton";
+import InputBase from "@material-ui/core/InputBase";
+import AppHeader from "./AppHeader";
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        margin: theme.spacing(1),
+    },
+    input: {
+        marginLeft: theme.spacing(1),
+        marginBottom: theme.spacing(1),
+        padding:theme.spacing(1),
+        flex: 1,
+    },
+    inputfield: {
+    }
+}));
+
 
 function MainPage() {
     const [newItemTitle, setNewItemTitle] = useState("");
@@ -11,6 +33,7 @@ function MainPage() {
     const [waitForApi, setWaitForApi] = useState(false);
     const {currentUser} = useContext(AuthContext);
     const [allChangesSaved, setAllChangesSaved] = useState(true);
+    const classes = useStyles();
 
     //Trigger (get list) on logged in user
     useEffect(() => {
@@ -27,11 +50,10 @@ function MainPage() {
             });
     }, [currentUser.email]);
 
-
     //Trigger (save list) on list change
     useEffect(() => {
         if (!allChangesSaved) {
-            setTodoForUser(currentUser.email,items);
+            setTodoForUser(currentUser.email, items);
             setAllChangesSaved(true);
         }
     }, [items, allChangesSaved, currentUser.email]);
@@ -53,31 +75,29 @@ function MainPage() {
     }
 
     return (
-        <div className="App">
-            <h1>TODO {currentUser && `for ${currentUser.email}`}</h1>
-            <pre>{items.size}</pre>
+        <div className={classes.root}>
             <form onSubmit={addItem}>
-                <div>
-                    <label/>
-                </div>
-                <input
-                    type="text"
-                    value={newItemTitle}
-                    onChange={(e) => setNewItemTitle(e.currentTarget.value)}
+                <InputBase className={classes.input}
+                           variant="standard"
+                           fullWidth
+                           placeholder="Legg til en oppgave"
+                           value={newItemTitle}
+                           onChange={(e) => setNewItemTitle(e.currentTarget.value)}
                 />
-                <button disabled={newItemTitle.length === 0}>Add</button>
             </form>
-            {waitForApi && (<h1>fetching data ...</h1>)}
+            {waitForApi && (<pre>fetching data ...</pre>)}
             {items &&
             items.map((item, index) =>
-            <li key={index}>
-                <Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} name="checked" />
-                {item.itemTitle}
-                <button onClick={(e) => deleteItem(index, e)}>Slett</button>
-            </li>
+                <ListItem key={index} button>
+                    <ListItemSecondaryAction>
+                        <Checkbox icon={<FavoriteBorder/>} checkedIcon={<Favorite/>} name="checked"/>
+                        <IconButton edge="end" onClick={(e) => deleteItem(index, e)}>
+                            <DeleteIcon/>
+                        </IconButton>
+                    </ListItemSecondaryAction>
+                    <ListItemText id={index} primary={item.itemTitle}/>
+                </ListItem>
             )}
-
-            <button onClick={() => app.auth().signOut()}>Sign out</button>
         </div>
     );
 }

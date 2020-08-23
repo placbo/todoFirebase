@@ -4,12 +4,13 @@ import "firebase/firestore";
 const collectionName = "todoLists";
 
 export const getTodoForUser = (userId) => {
-    if (process.env.REACT_APP_USE_MOCK) {
+    if (process.env.REACT_APP_USE_MOCK==="true") {
         return new Promise((resolve, reject) => {
             let MOCK_DATA = [
-                {itemTitle: "test1"},
-                {itemTitle: "test2"},
-                {itemTitle: "test3"}
+                {itemTitle: "TODO-item 1"},
+                {itemTitle: "TODO-item 2"},
+                {itemTitle: "TODO-item 3"},
+                {itemTitle: "TODO-item 4"},
             ];
             resolve(MOCK_DATA);
         });
@@ -26,7 +27,7 @@ export const getTodoForUser = (userId) => {
 
 
 export const setTodoForUser = (userId, tasks) => {
-    if (process.env.REACT_APP_USE_MOCK) {
+    if (process.env.REACT_APP_USE_MOCK==="true") {
         return;
     }
     return firebase
