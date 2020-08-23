@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
 import app from "./firebase";
-import firebase from "./firebase";
 import {AuthContext} from "./Auth";
 import {getTodoForUser, setTodoForUser} from "./api";
 
@@ -9,6 +8,7 @@ function MainPage() {
     const [items, setItems] = useState([]);
     const [waitForApi, setWaitForApi] = useState(false);
     const {currentUser} = useContext(AuthContext);
+    const [allChangesSaved, setAllChangesSaved] = useState(true);
 
     useEffect(() => {
         setWaitForApi(true);
@@ -24,14 +24,22 @@ function MainPage() {
             });
     }, [currentUser.email]);
 
-    const onSubmit = (e) => {
+
+    useEffect(() => {
+        if (!allChangesSaved) {
+            setTodoForUser(currentUser.email,items);
+            setAllChangesSaved(true);
+        }
+    }, [items, allChangesSaved, currentUser.email]);
+
+
+    const addItem = (e) => {
         e.preventDefault();
         let newItem = {"itemTitle": newItemTitle};
         let data = [...items, newItem];
         setItems(data);
-        //TODO: useEffect på items -> lagre når items er endret
         setNewItemTitle("");
-        setTodoForUser(currentUser.email,data);
+        setAllChangesSaved(false);
     };
 
     const deleteItem = (index, e) => {
@@ -39,15 +47,14 @@ function MainPage() {
         items.splice(index, 1)
         //setItems(items.slice());
         setItems([...items]); //TODO: forstå denne
-        setTodoForUser(currentUser.email,items);
-
+        setAllChangesSaved(false);
     }
 
     return (
         <div className="App">
             <h1>TODO {currentUser && `for ${currentUser.email}`}</h1>
             <pre>{items.size}</pre>
-            <form onSubmit={onSubmit}>
+            <form onSubmit={addItem}>
                 <div>
                     <label/>
                 </div>
