@@ -36,8 +36,7 @@ function MainPage() {
     const addItem = (e) => {
         e.preventDefault();
         let newItem = {"itemTitle": newItemTitle};
-        let data = [...items, newItem];
-        setItems(data);
+        setItems([...items, newItem]);
         setNewItemTitle("");
         setAllChangesSaved(false);
     };
