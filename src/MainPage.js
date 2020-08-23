@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {AuthContext, AuthProvider} from "./Auth";
+import {AuthContext} from "./Auth";
 import {getTodoForUser, setTodoForUser} from "./api";
 import Checkbox from "@material-ui/core/Checkbox";
 import {Favorite, FavoriteBorder} from "@material-ui/icons";
@@ -10,7 +10,6 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from "@material-ui/core/IconButton";
 import InputBase from "@material-ui/core/InputBase";
-import AppHeader from "./AppHeader";
 
 const useStyles = makeStyles((theme) => ({
     root: {
