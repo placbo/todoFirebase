@@ -1,32 +1,46 @@
 import React, {useContext, useEffect, useState} from "react";
 import {AuthContext} from "./Auth";
 import {getTodoForUser, setTodoForUser} from "./api";
-import Checkbox from "@material-ui/core/Checkbox";
-import {Favorite, FavoriteBorder} from "@material-ui/icons";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from "@material-ui/core/IconButton";
 import InputBase from "@material-ui/core/InputBase";
+import {Container, Draggable} from "react-smooth-dnd";
+import arrayMove from "array-move";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import DragHandleIcon from "@material-ui/icons/DragHandle";
+import {Divider} from "@material-ui/core";
+import {v4 as uuidv4} from 'uuid';
+import EditableTextField from "./EditableTextField";
+import Card from "@material-ui/core/Card";
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
         margin: theme.spacing(1),
+        listStyleType: 'none', //hack!!
+        display: 'flex',
+        justifyContent: 'center',
+    },
+    pcb : {
+        color:"red",
+    },
+    card: {
+        width: "800px",
     },
     input: {
         marginLeft: theme.spacing(1),
         marginBottom: theme.spacing(1),
-        padding:theme.spacing(1),
+        padding: theme.spacing(1),
         flex: 1,
     },
-    inputfield: {
-    }
+    inputfield: {},
 }));
 
 
-function MainPage() {
+const MainPage = () => {
     const [newItemTitle, setNewItemTitle] = useState("");
     const [items, setItems] = useState([]);
     const [waitForApi, setWaitForApi] = useState(false);
@@ -52,6 +66,7 @@ function MainPage() {
     //Trigger (save list) on list change
     useEffect(() => {
         if (!allChangesSaved) {
+            console.log("SAVING", items);
             setTodoForUser(currentUser.email, items);
             setAllChangesSaved(true);
         }
@@ -59,7 +74,12 @@ function MainPage() {
 
     const addItem = (e) => {
         e.preventDefault();
-        let newItem = {"itemTitle": newItemTitle};
+        let newItem = {
+            "itemTitle": newItemTitle,
+            "id": uuidv4(),
+            "favorite": false,
+            "done": false,
+        };
         setItems([...items, newItem]);
         setNewItemTitle("");
         setAllChangesSaved(false);
@@ -73,30 +93,64 @@ function MainPage() {
         setAllChangesSaved(false);
     }
 
+    const onDrop = ({removedIndex, addedIndex}) => {
+        setItems(items => arrayMove(items, removedIndex, addedIndex));
+        setAllChangesSaved(false);
+    };
+
+    const updateItemTitle = (value, index) => {
+        console.log(index);
+        items[index].itemTitle = value;
+        console.log(items);
+        setItems([...items])
+        setAllChangesSaved(false);
+    };
+
     return (
         <div className={classes.root}>
-            <form onSubmit={addItem}>
-                <InputBase className={classes.input}
-                           variant="standard"
-                           fullWidth
-                           placeholder="Legg til en oppgave"
-                           value={newItemTitle}
-                           onChange={(e) => setNewItemTitle(e.currentTarget.value)}
-                />
-            </form>
-            {waitForApi && (<pre>fetching data ...</pre>)}
-            {items &&
-            items.map((item, index) =>
-                <ListItem key={index} button>
-                    <ListItemSecondaryAction>
-                        <Checkbox icon={<FavoriteBorder/>} checkedIcon={<Favorite/>} name="checked"/>
-                        <IconButton edge="end" onClick={(e) => deleteItem(index, e)}>
-                            <DeleteIcon/>
-                        </IconButton>
-                    </ListItemSecondaryAction>
-                    <ListItemText id={index} primary={item.itemTitle}/>
-                </ListItem>
-            )}
+            <Card className={classes.card}>
+                <form onSubmit={addItem}>
+                    <InputBase className={classes.input}
+                               variant="standard"
+                               fullWidth
+                               placeholder="Legg til en oppgave"
+                               value={newItemTitle}
+                               onChange={(e) => setNewItemTitle(e.currentTarget.value)}
+                    />
+                </form>
+                <Container onDrop={onDrop} dragHandleSelector=".drag-handle" lockAxis="y" dropPlaceholder={{
+                    animationDuration: 150,
+                    showOnTop: true,
+                    className: 'cards-drop-preview'
+                }}>
+                    {items && items.map(({id, itemTitle}, index) => {
+                        return (
+                            <Draggable key={id}>
+                                <ListItem>
+                                    {/*<ListItemText id={id} primary={itemTitle}/>*/}
+                                    <EditableTextField   value={itemTitle} index={index}
+                                                       updateItemTitle={(value, index) => updateItemTitle(value, index)}/>
+                                    <ListItemSecondaryAction>
+                                        <ListItemIcon >
+                                            <IconButton onClick={(e) => deleteItem(index, e)}>
+                                                <DeleteIcon/>
+                                            </IconButton>
+                                        </ListItemIcon>
+                                        {/*<ListItemIcon>
+                                        <Checkbox icon={<FavoriteBorder/>} checkedIcon={<Favorite/>} onClick={(e) => setFavorite(id, e)} name="checked"/>
+                                    </ListItemIcon>*/}
+                                        <ListItemIcon style={{minWidth:"0"}} className="drag-handle">
+                                            <DragHandleIcon/>
+                                        </ListItemIcon>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                                <Divider/>
+                            </Draggable>
+                        );
+                    })}
+                </Container>
+                {waitForApi && (<pre>fetching data ...</pre>)}
+            </Card>
         </div>
     );
 }
