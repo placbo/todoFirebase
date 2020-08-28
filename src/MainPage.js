@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
     },
     card: {
         width: "800px",
+        minWidth: "300px"
     },
     input: {
         marginLeft: theme.spacing(1),
@@ -66,7 +67,6 @@ const MainPage = () => {
     //Trigger (save list) on list change
     useEffect(() => {
         if (!allChangesSaved) {
-            console.log("SAVING", items);
             setTodoForUser(currentUser.email, items);
             setAllChangesSaved(true);
         }
@@ -99,9 +99,7 @@ const MainPage = () => {
     };
 
     const updateItemTitle = (value, index) => {
-        console.log(index);
         items[index].itemTitle = value;
-        console.log(items);
         setItems([...items])
         setAllChangesSaved(false);
     };

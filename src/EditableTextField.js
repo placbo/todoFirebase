@@ -61,12 +61,13 @@ const EditableTextField = ({value, index, updateItemTitle}) => {
     return (
         <>
             <span
-                style={{width:"100%", backgroundColor:"pink"}}
+                style={{width:"80%", cursor:"pointer"}}
                 className={classes.showAsText}
                 onClick={onButtonClick}>
                 {newValue}
             </span>
             <input
+                style={{width:"80%"}}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 className={classes.showAsInputField}
