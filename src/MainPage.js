@@ -111,6 +111,7 @@ const MainPage = () => {
                     <InputBase className={classes.input}
                                variant="standard"
                                fullWidth
+                               required
                                placeholder="Legg til en oppgave"
                                value={newItemTitle}
                                onChange={(e) => setNewItemTitle(e.currentTarget.value)}
@@ -124,7 +125,7 @@ const MainPage = () => {
                     {items && items.map(({id, itemTitle}, index) => {
                         return (
                             <Draggable key={id}>
-                                <ListItem>
+                                <ListItem style={{height:"3rem"}}>
                                     {/*<ListItemText id={id} primary={itemTitle}/>*/}
                                     <EditableTextField   value={itemTitle} index={index}
                                                        updateItemTitle={(value, index) => updateItemTitle(value, index)}/>
