@@ -7,10 +7,13 @@ export const getTodoForUser = (userId) => {
     if (process.env.REACT_APP_USE_MOCK==="true") {
         return new Promise((resolve, reject) => {
             let MOCK_DATA = [
-                {id:"1",itemTitle: "TODO-item 1"},
-                {id:"2",itemTitle: "TODO-item 2"},
-                {id:"3",itemTitle: "TODO-item 3"},
-                {id:"4",itemTitle: "TODO-item 4"},
+                {id:"1",itemTitle: "TODO-item 1","isFavorite": true, "isDone": false},
+                {id:"2",itemTitle: "TODO-item 2","isFavorite": false, "isDone": false},
+                {id:"3",itemTitle: "TODO-item 3","isFavorite": false, "isDone": true},
+                {id:"4",itemTitle: "TODO-item 4","isFavorite": false, "isDone": false},
+
+
+
             ];
             console.log("Mock retrieving list")
             resolve(MOCK_DATA);

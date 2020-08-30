@@ -11,11 +11,14 @@ import {Container, Draggable} from "react-smooth-dnd";
 import arrayMove from "array-move";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import DragHandleIcon from "@material-ui/icons/DragHandle";
-import {Divider} from "@material-ui/core";
+import {Divider, Typography} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid';
 import EditableTextField from "./EditableTextField";
 import Card from "@material-ui/core/Card";
-
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import Checkbox from "@material-ui/core/Checkbox";
+import {Favorite, FavoriteBorder} from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,9 +26,6 @@ const useStyles = makeStyles((theme) => ({
         listStyleType: 'none', //hack!!
         display: 'flex',
         justifyContent: 'center',
-    },
-    pcb : {
-        color:"red",
     },
     card: {
         width: "800px",
@@ -77,19 +77,34 @@ const MainPage = () => {
         let newItem = {
             "itemTitle": newItemTitle,
             "id": uuidv4(),
-            "favorite": false,
-            "done": false,
+            "isFavorite": false,
+            "isDone": false,
         };
         setItems([...items, newItem]);
         setNewItemTitle("");
         setAllChangesSaved(false);
     };
 
-    const deleteItem = (index, e) => {
+    const deleteItem = (id, e) => {
         e.preventDefault();
-        items.splice(index, 1)
-        //setItems(items.slice());
+        items.splice(items.findIndex(item => item.id === id), 1)
         setItems([...items]); //TODO: forstå denne
+        setAllChangesSaved(false);
+    }
+
+    const toggleItemDone = (id, e) => {
+        e.preventDefault();
+        let selectedItem = items.find(item => item.id === id);
+        selectedItem.isDone = !selectedItem.isDone;
+        setItems([...items])
+        setAllChangesSaved(false);
+    }
+
+    const toggleFavorite = (id, e) => {
+        e.preventDefault();
+        let selectedItem = items.find(item => item.id === id);
+        selectedItem.isFavorite = !selectedItem.isFavorite;
+        setItems([...items])
         setAllChangesSaved(false);
     }
 
@@ -98,8 +113,8 @@ const MainPage = () => {
         setAllChangesSaved(false);
     };
 
-    const updateItemTitle = (value, index) => {
-        items[index].itemTitle = value;
+    const updateItemTitle = (updatedItemTitle, id) => {
+        items.find(item => item.id === id).itemTitle = updatedItemTitle;
         setItems([...items])
         setAllChangesSaved(false);
     };
@@ -122,23 +137,26 @@ const MainPage = () => {
                     showOnTop: true,
                     className: 'cards-drop-preview'
                 }}>
-                    {items && items.map(({id, itemTitle}, index) => {
+                    {items &&
+                    items.filter(function (item) {
+                        return !item.isDone;
+                    }).map(({id, isFavorite, itemTitle}, index) => {
                         return (
                             <Draggable key={id}>
-                                <ListItem style={{height:"3rem"}}>
-                                    {/*<ListItemText id={id} primary={itemTitle}/>*/}
-                                    <EditableTextField   value={itemTitle} index={index}
-                                                       updateItemTitle={(value, index) => updateItemTitle(value, index)}/>
+                                <ListItem style={{height: "3rem"}}>
+                                    <ListItemIcon>
+                                        <IconButton onClick={(e) => toggleItemDone(id, e)}>
+                                            <CheckBoxOutlineBlankIcon/>
+                                        </IconButton>
+                                    </ListItemIcon>
+                                    <EditableTextField value={itemTitle} id={id}
+                                                       updateItemTitle={(value, id) => updateItemTitle(value, id)}/>
                                     <ListItemSecondaryAction>
-                                        <ListItemIcon >
-                                            <IconButton onClick={(e) => deleteItem(index, e)}>
-                                                <DeleteIcon/>
-                                            </IconButton>
+                                        <ListItemIcon>
+                                            <Checkbox checked={isFavorite} icon={<FavoriteBorder/>} checkedIcon={<Favorite/>}
+                                                      onClick={(e) => toggleFavorite(id, e)} name="checked"/>
                                         </ListItemIcon>
-                                        {/*<ListItemIcon>
-                                        <Checkbox icon={<FavoriteBorder/>} checkedIcon={<Favorite/>} onClick={(e) => setFavorite(id, e)} name="checked"/>
-                                    </ListItemIcon>*/}
-                                        <ListItemIcon style={{minWidth:"0"}} className="drag-handle">
+                                        <ListItemIcon style={{minWidth: "0"}} className="drag-handle">
                                             <DragHandleIcon/>
                                         </ListItemIcon>
                                     </ListItemSecondaryAction>
@@ -148,6 +166,35 @@ const MainPage = () => {
                         );
                     })}
                 </Container>
+
+                <div style={{height:"2rem", backgroundColor:"#494D5F"}}/>
+
+                {items
+                && items.filter(function (item) {
+                    return item.isDone;
+                }).map(({id, itemTitle}) => {
+                    return (
+                        <ListItem key={id} style={{height: "3rem", backgroundColor: "grey"}}>
+                            <ListItemIcon>
+                                <IconButton onClick={(e) => toggleItemDone(id, e)}>
+                                    <CheckBoxIcon/>
+                                </IconButton>
+                            </ListItemIcon>
+                            <Typography variant="body1" style={{textDecoration: "line-through"}}>
+                                {itemTitle}
+                            </Typography>
+                            <ListItemSecondaryAction>
+                                <ListItemIcon>
+                                    <IconButton onClick={(e) => deleteItem(id, e)}>
+                                        <DeleteIcon/>
+                                    </IconButton>
+                                </ListItemIcon>
+
+                            </ListItemSecondaryAction>
+                        </ListItem>
+                    );
+                })}
+
                 {waitForApi && (<pre>fetching data ...</pre>)}
             </Card>
         </div>

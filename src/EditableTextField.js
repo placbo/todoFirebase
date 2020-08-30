@@ -4,7 +4,7 @@ import {Typography} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 
 
-const EditableTextField = ({value, index, updateItemTitle}) => {
+const EditableTextField = ({value, id, updateItemTitle}) => {
 
     const [newValue, setNewValue] = useState(value);
     const [editMode, setEditMode] = useState(false);
@@ -44,13 +44,13 @@ const EditableTextField = ({value, index, updateItemTitle}) => {
 
     const handleBlur = () => {
         setEditMode(false);
-        updateItemTitle(newValue, index);
+        updateItemTitle(newValue, id);
     };
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             setEditMode(false);
-            updateItemTitle(newValue, index);
+            updateItemTitle(newValue, id);
         }
     }
 
