@@ -4,19 +4,16 @@ import {getTodoForUser, setTodoForUser} from "./api";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItem from "@material-ui/core/ListItem";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from "@material-ui/core/IconButton";
 import InputBase from "@material-ui/core/InputBase";
 import {Container, Draggable} from "react-smooth-dnd";
 import arrayMove from "array-move";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import DragHandleIcon from "@material-ui/icons/DragHandle";
-import {Divider, Typography} from "@material-ui/core";
+import {Divider} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid';
 import EditableTextField from "./EditableTextField";
-import Card from "@material-ui/core/Card";
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import Checkbox from "@material-ui/core/Checkbox";
 import {Favorite, FavoriteBorder} from "@material-ui/icons";
 
@@ -85,13 +82,6 @@ const MainPage = () => {
         setAllChangesSaved(false);
     };
 
-    const deleteItem = (id, e) => {
-        e.preventDefault();
-        items.splice(items.findIndex(item => item.id === id), 1)
-        setItems([...items]); //TODO: forstå denne
-        setAllChangesSaved(false);
-    }
-
     const toggleItemDone = (id, e) => {
         e.preventDefault();
         let selectedItem = items.find(item => item.id === id);
@@ -121,7 +111,7 @@ const MainPage = () => {
 
     return (
         <div className={classes.root}>
-            <Card className={classes.card}>
+            <div className={classes.card}>
                 <form onSubmit={addItem}>
                     <InputBase className={classes.input}
                                variant="standard"
@@ -167,36 +157,8 @@ const MainPage = () => {
                     })}
                 </Container>
 
-                <div style={{height:"2rem", backgroundColor:"#494D5F"}}/>
-
-                {items
-                && items.filter(function (item) {
-                    return item.isDone;
-                }).map(({id, itemTitle}) => {
-                    return (
-                        <ListItem key={id} style={{height: "3rem", backgroundColor: "grey"}}>
-                            <ListItemIcon>
-                                <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                                    <CheckBoxIcon/>
-                                </IconButton>
-                            </ListItemIcon>
-                            <Typography variant="body1" style={{textDecoration: "line-through"}}>
-                                {itemTitle}
-                            </Typography>
-                            <ListItemSecondaryAction>
-                                <ListItemIcon>
-                                    <IconButton onClick={(e) => deleteItem(id, e)}>
-                                        <DeleteIcon/>
-                                    </IconButton>
-                                </ListItemIcon>
-
-                            </ListItemSecondaryAction>
-                        </ListItem>
-                    );
-                })}
-
                 {waitForApi && (<pre>fetching data ...</pre>)}
-            </Card>
+            </div>
         </div>
     );
 }

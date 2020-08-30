@@ -7,6 +7,7 @@ import MainPage from "./MainPage";
 import AppHeader from "./AppHeader";
 import {createMuiTheme} from '@material-ui/core/styles';
 import {ThemeProvider} from "@material-ui/styles";
+import DonePage from "./DonePage";
 
 const theme = createMuiTheme({
     palette: {
@@ -26,6 +27,7 @@ const App = () => {
                 <AppHeader/>
                 <Router>
                     <PrivateRoute exact path="/" component={MainPage}/>
+                    <Route exact path="/done" component={DonePage}/>
                     <Route exact path="/login" component={Login}/>
                 </Router>
             </AuthProvider>
