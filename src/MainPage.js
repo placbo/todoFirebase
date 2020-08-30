@@ -140,7 +140,7 @@ const MainPage = () => {
                     {items &&
                     items.filter(function (item) {
                         return !item.isDone;
-                    }).map(({id, isFavorite, itemTitle}, index) => {
+                    }).map(({id, isFavorite, itemTitle}) => {
                         return (
                             <Draggable key={id}>
                                 <ListItem style={{height: "3rem"}}>
