@@ -9,6 +9,10 @@ import IconButton from "@material-ui/core/IconButton";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import {Typography} from "@material-ui/core";
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import AppHeader from "./AppHeader";
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import {useHistory} from "react-router";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,7 +31,9 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1),
         flex: 1,
     },
-    inputfield: {},
+    actionLine: {
+        padding: "5px"
+    },
 }));
 
 
@@ -37,6 +43,12 @@ const MainPage = () => {
     const {currentUser} = useContext(AuthContext);
     const [allChangesSaved, setAllChangesSaved] = useState(true);
     const classes = useStyles();
+    const history = useHistory();
+
+
+    const goToHomePage = () => {
+        history.push("/");
+    }
 
     //Trigger (get list) on logged in user
     useEffect(() => {
@@ -62,11 +74,16 @@ const MainPage = () => {
     }, [items, allChangesSaved, currentUser.email]);
 
 
-
     const deleteItem = (id, e) => {
         e.preventDefault();
         items.splice(items.findIndex(item => item.id === id), 1)
         setItems([...items]); //TODO: forstå denne
+        setAllChangesSaved(false);
+    }
+
+    const deleteAllDone = (id, e) => {
+        e.preventDefault();
+        console.log("Deleting all")
         setAllChangesSaved(false);
     }
 
@@ -79,40 +96,49 @@ const MainPage = () => {
     }
 
 
-
     return (
-        <div className={classes.root}>
-            <div className={classes.card}>
-
-                {items
-                && items.filter(function (item) {
-                    return item.isDone;
-                }).map(({id, itemTitle}) => {
-                    return (
-                        <ListItem key={id} style={{height: "3rem", backgroundColor: "grey"}}>
-                            <ListItemIcon>
-                                <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                                    <CheckBoxIcon/>
-                                </IconButton>
-                            </ListItemIcon>
-                            <Typography variant="body1" style={{textDecoration: "line-through"}}>
-                                {itemTitle}
-                            </Typography>
-                            <ListItemSecondaryAction>
+        <>
+            <AppHeader/>
+            <div className={classes.root}>
+                <div className={classes.card}>
+                    <div className={classes.actionLine}>
+                        <IconButton  onClick={goToHomePage}>
+                            <ArrowBackIcon/>
+                        </IconButton>
+                        {/*<Button s  onClick={deleteAllDone}>*/}
+                        {/*    Clear list*/}
+                        {/*</Button>*/}
+                    </div>
+                    {items
+                    && items.filter(function (item) {
+                        return item.isDone;
+                    }).map(({id, itemTitle}) => {
+                        return (
+                            <ListItem key={id} style={{height: "3rem"}}>
                                 <ListItemIcon>
-                                    <IconButton onClick={(e) => deleteItem(id, e)}>
-                                        <DeleteIcon/>
+                                    <IconButton onClick={(e) => toggleItemDone(id, e)}>
+                                        <CheckBoxIcon/>
                                     </IconButton>
                                 </ListItemIcon>
+                                <Typography variant="body1" style={{textDecoration: "line-through"}}>
+                                    {itemTitle}
+                                </Typography>
+                                <ListItemSecondaryAction>
+                                    <ListItemIcon>
+                                        <IconButton onClick={(e) => deleteItem(id, e)}>
+                                            <DeleteIcon/>
+                                        </IconButton>
+                                    </ListItemIcon>
 
-                            </ListItemSecondaryAction>
-                        </ListItem>
-                    );
-                })}
+                                </ListItemSecondaryAction>
+                            </ListItem>
+                        );
+                    })}
 
-                {waitForApi && (<pre>fetching data ...</pre>)}
+                    {waitForApi && (<pre>fetching data ...</pre>)}
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

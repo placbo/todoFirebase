@@ -4,7 +4,6 @@ import Login from "./Login";
 import {AuthProvider} from "./Auth";
 import PrivateRoute from "./PrivateRoute";
 import MainPage from "./MainPage";
-import AppHeader from "./AppHeader";
 import {createMuiTheme} from '@material-ui/core/styles';
 import {ThemeProvider} from "@material-ui/styles";
 import DonePage from "./DonePage";
@@ -24,7 +23,6 @@ const App = () => {
     return (
         <ThemeProvider theme={theme}>
             <AuthProvider>
-                <AppHeader/>
                 <Router>
                     <PrivateRoute exact path="/" component={MainPage}/>
                     <Route exact path="/done" component={DonePage}/>

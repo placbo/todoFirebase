@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -13,17 +13,12 @@ import Menu from "@material-ui/core/Menu";
 import {useHistory} from "react-router";
 
 const useStyles = makeStyles((theme) => ({
-    // menuButton: {
-    //     marginRight: theme.spacing(2),
-    // },
     root: {
         backgroundColor: theme.palette.primary
     },
     title: {
         flexGrow: 1,
-    },
-    userName: {
-        flexGrow: 1,
+        cursor:'pointer'
     },
 }));
 
@@ -32,7 +27,7 @@ const AppHeader = () => {
     const history = useHistory();
     const classes = useStyles();
     const {currentUser} = useContext(AuthContext);
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -41,7 +36,9 @@ const AppHeader = () => {
     const goToDonePage = () => {
         history.push("/done");
     }
-
+    const goToHomePage = () => {
+        history.push("/");
+    }
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -51,33 +48,35 @@ const AppHeader = () => {
     return (
         <AppBar position="static" className={classes.root}>
             <Toolbar>
-                <Typography variant="h6" className={classes.title}>
-                    ONKEL PERS TODOAPP
+                <Typography variant="h6" className={classes.title} onClick={goToHomePage}>
+                        TODOAPP
                 </Typography>
                 {!currentUser && <Button color="inherit">Login</Button>}
                 {!!currentUser &&
-                <IconButton
-                    className={classes.menuButton}
-                    color="inherit"
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={handleClick}>
-                    <MenuIcon/>
-                </IconButton>
+                <React.Fragment>
+                    <IconButton
+                        className={classes.menuButton}
+                        color="inherit"
+                        aria-controls="simple-menu"
+                        aria-haspopup="true"
+                        onClick={handleClick}>
+                        <MenuIcon/>
+                    </IconButton>
+                    <Menu
+                        id="simple-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={!!anchorEl}
+                        onClose={handleClose}
+                    >
+                        <div style={{padding: "8px"}}>
+                            <Typography variant="h6">Signed in as: {currentUser.email} </Typography>
+                        </div>
+                        <MenuItem onClick={goToDonePage}>Show done items</MenuItem>
+                        <MenuItem onClick={signOut}>Log out</MenuItem>
+                    </Menu>
+                    </React.Fragment>
                 }
-                <Menu
-                    id="simple-menu"
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                >
-                    <div style={{padding: "8px"}}>
-                        <Typography variant="h6">Signed in as: {currentUser.email} </Typography>
-                    </div>
-                    {/*<MenuItem onClick={goToDonePage}>Show done items</MenuItem>*/}
-                    <MenuItem onClick={signOut}>Log out</MenuItem>
-                </Menu>
             </Toolbar>
         </AppBar>
     );

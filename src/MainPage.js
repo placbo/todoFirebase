@@ -16,6 +16,7 @@ import EditableTextField from "./EditableTextField";
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import Checkbox from "@material-ui/core/Checkbox";
 import {Favorite, FavoriteBorder} from "@material-ui/icons";
+import AppHeader from "./AppHeader";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -99,7 +100,12 @@ const MainPage = () => {
     }
 
     const onDrop = ({removedIndex, addedIndex}) => {
-        setItems(items => arrayMove(items, removedIndex, addedIndex));
+        const doneItems = items.filter(function (item) {
+            return !item.isDone;
+        })
+        const removedIndexInFullList = items.findIndex(item => item.id === doneItems[removedIndex].id)
+        const addedIndexInFullList = items.findIndex(item => item.id === doneItems[addedIndex].id)
+        setItems(items => arrayMove(items, removedIndexInFullList, addedIndexInFullList));
         setAllChangesSaved(false);
     };
 
@@ -110,56 +116,67 @@ const MainPage = () => {
     };
 
     return (
-        <div className={classes.root}>
-            <div className={classes.card}>
-                <form onSubmit={addItem}>
-                    <InputBase className={classes.input}
-                               variant="standard"
-                               fullWidth
-                               required
-                               placeholder="Legg til en oppgave"
-                               value={newItemTitle}
-                               onChange={(e) => setNewItemTitle(e.currentTarget.value)}
-                    />
-                </form>
-                <Container onDrop={onDrop} dragHandleSelector=".drag-handle" lockAxis="y" dropPlaceholder={{
-                    animationDuration: 150,
-                    showOnTop: true,
-                    className: 'cards-drop-preview'
-                }}>
-                    {items &&
-                    items.filter(function (item) {
-                        return !item.isDone;
-                    }).map(({id, isFavorite, itemTitle}) => {
-                        return (
-                            <Draggable key={id}>
-                                <ListItem style={{height: "3rem"}}>
-                                    <ListItemIcon>
-                                        <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                                            <CheckBoxOutlineBlankIcon/>
-                                        </IconButton>
-                                    </ListItemIcon>
-                                    <EditableTextField value={itemTitle} id={id}
-                                                       updateItemTitle={(value, id) => updateItemTitle(value, id)}/>
-                                    <ListItemSecondaryAction>
+        <>
+            <AppHeader/>
+            <div className={classes.root}>
+                <div className={classes.card}>
+                    <form onSubmit={addItem}>
+                        <InputBase className={classes.input}
+                                   variant="standard"
+                                   fullWidth
+                                   required
+                                   placeholder="Legg til en oppgave"
+                                   value={newItemTitle}
+                                   onChange={(e) => setNewItemTitle(e.currentTarget.value)}
+                        />
+                    </form>
+                    <Container onDrop={onDrop} getChildPayload={(index) => items[index]}
+                               dragHandleSelector=".drag-handle"
+                               lockAxis="y" dropPlaceholder={{
+                        animationDuration: 150,
+                        showOnTop: true,
+                        className: 'cards-drop-preview'
+                    }}>
+                        {items &&
+                        items.filter(function (item) {
+                            return !item.isDone;
+                        }).map(({id, isFavorite, itemTitle}) => {
+                            return (
+                                <Draggable key={id}>
+                                    <ListItem style={{height: "3rem"}}>
                                         <ListItemIcon>
-                                            <Checkbox checked={isFavorite} icon={<FavoriteBorder/>} checkedIcon={<Favorite/>}
-                                                      onClick={(e) => toggleFavorite(id, e)} name="checked"/>
+                                            <IconButton onClick={(e) => toggleItemDone(id, e)}>
+                                                <CheckBoxOutlineBlankIcon/>
+                                            </IconButton>
                                         </ListItemIcon>
-                                        <ListItemIcon style={{minWidth: "0"}} className="drag-handle">
-                                            <DragHandleIcon/>
-                                        </ListItemIcon>
-                                    </ListItemSecondaryAction>
-                                </ListItem>
-                                <Divider/>
-                            </Draggable>
-                        );
-                    })}
-                </Container>
+                                        <EditableTextField value={itemTitle} id={id}
+                                                           updateItemTitle={(value, id) => updateItemTitle(value, id)}/>
+                                        <ListItemSecondaryAction>
+                                            <ListItemIcon>
+                                                <Checkbox checked={isFavorite} icon={<FavoriteBorder/>}
+                                                          checkedIcon={<Favorite/>}
+                                                          onClick={(e) => toggleFavorite(id, e)} name="checked"/>
+                                            </ListItemIcon>
+                                            <ListItemIcon style={{minWidth: "0"}} className="drag-handle">
+                                                <DragHandleIcon/>
+                                            </ListItemIcon>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                    <Divider/>
+                                </Draggable>
+                            );
+                        })}
+                    </Container>
 
-                {waitForApi && (<pre>fetching data ...</pre>)}
+                    {waitForApi && (<pre>fetching data ...</pre>)}
+
+                    {/*<pre>*/}
+                    {/*    {JSON.stringify(items, undefined, 4)}*/}
+                    {/*</pre>*/}
+
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 
