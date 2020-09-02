@@ -32,8 +32,11 @@ const useStyles = makeStyles((theme) => ({
         flex: 1,
     },
     actionLine: {
-        padding: "5px"
+        padding: "5px",
+        display: "flex",
+        justifyContent: "space-between"
     },
+    deleteAllButton: {}
 }));
 
 
@@ -75,15 +78,21 @@ const MainPage = () => {
 
 
     const deleteItem = (id, e) => {
-        e.preventDefault();
         items.splice(items.findIndex(item => item.id === id), 1)
         setItems([...items]); //TODO: forstå denne
         setAllChangesSaved(false);
     }
 
-    const deleteAllDone = (id, e) => {
-        e.preventDefault();
-        console.log("Deleting all")
+    const deleteAllDone = (e) => {
+        const IndexesToBeRemoved = items.reduce(function (indexList, item, index) {
+            if (item.isDone)
+                indexList.push(index);
+            return indexList;
+        }, []);
+        while(IndexesToBeRemoved.length) {
+            items.splice(IndexesToBeRemoved.pop(), 1);
+        }
+        setItems([...items])
         setAllChangesSaved(false);
     }
 
@@ -102,38 +111,37 @@ const MainPage = () => {
             <div className={classes.root}>
                 <div className={classes.card}>
                     <div className={classes.actionLine}>
-                        <IconButton  onClick={goToHomePage}>
+                        <IconButton onClick={goToHomePage}>
                             <ArrowBackIcon/>
                         </IconButton>
-                        {/*<Button s  onClick={deleteAllDone}>*/}
-                        {/*    Clear list*/}
-                        {/*</Button>*/}
+                        <Button onClick={deleteAllDone} className={classes.deleteAllButton}>
+                            Delete all
+                        </Button>
                     </div>
                     {items
-                    && items.filter(function (item) {
-                        return item.isDone;
-                    }).map(({id, itemTitle}) => {
-                        return (
-                            <ListItem key={id} style={{height: "3rem"}}>
-                                <ListItemIcon>
-                                    <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                                        <CheckBoxIcon/>
-                                    </IconButton>
-                                </ListItemIcon>
-                                <Typography variant="body1" style={{textDecoration: "line-through"}}>
-                                    {itemTitle}
-                                </Typography>
-                                <ListItemSecondaryAction>
+                    && items.filter(item => item.isDone)
+                        .map(({id, itemTitle}) => {
+                            return (
+                                <ListItem key={id} style={{height: "3rem"}}>
                                     <ListItemIcon>
-                                        <IconButton onClick={(e) => deleteItem(id, e)}>
-                                            <DeleteIcon/>
+                                        <IconButton onClick={(e) => toggleItemDone(id, e)}>
+                                            <CheckBoxIcon/>
                                         </IconButton>
                                     </ListItemIcon>
+                                    <Typography variant="body1" style={{textDecoration: "line-through"}}>
+                                        {itemTitle}
+                                    </Typography>
+                                    <ListItemSecondaryAction>
+                                        <ListItemIcon>
+                                            <IconButton onClick={(e) => deleteItem(id, e)}>
+                                                <DeleteIcon/>
+                                            </IconButton>
+                                        </ListItemIcon>
 
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                        );
-                    })}
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            );
+                        })}
 
                     {waitForApi && (<pre>fetching data ...</pre>)}
                 </div>

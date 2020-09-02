@@ -10,7 +10,10 @@ export const getTodoForUser = (userId) => {
                 {id:"1",itemTitle: "TODO-item 1","isFavorite": true, "isDone": false},
                 {id:"2",itemTitle: "TODO-item 2","isFavorite": false, "isDone": false},
                 {id:"3",itemTitle: "TODO-item 3","isFavorite": false, "isDone": true},
-                {id:"4",itemTitle: "TODO-item 4","isFavorite": false, "isDone": false},
+                {id:"4",itemTitle: "TODO-item 4","isFavorite": false, "isDone": true},
+                {id:"5",itemTitle: "TODO-item 5","isFavorite": false, "isDone": false},
+                {id:"6",itemTitle: "TODO-item 6","isFavorite": false, "isDone": true},
+                {id:"7",itemTitle: "TODO-item 7","isFavorite": false, "isDone": false},
 
 
 
