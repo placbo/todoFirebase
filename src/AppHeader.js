@@ -80,7 +80,7 @@ const AppHeader = () => {
                         <div style={{padding: "8px"}}>
                             {currentUser.displayName
                                 ?
-                                <Typography variant="h6"><img src={currentUser.photoURL}
+                                <Typography variant="h6"><img src={currentUser.photoURL} alt="Avatar"
                                                               className={classes.profileImage}/>{currentUser.displayName} </Typography>
                                 :
                                 <Typography variant="h6">Signed in as: {currentUser.email} </Typography>
