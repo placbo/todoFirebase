@@ -11,6 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import {useHistory} from "react-router";
+import {Divider} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -18,8 +19,15 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
         flexGrow: 1,
-        cursor:'pointer'
+        cursor: 'pointer'
     },
+    profileImage: {
+        borderRadius: '50%',
+        verticalAlign: 'middle',
+        maxWidth: '3rem',
+        maxHeight: '3rem',
+        marginRight: '1rem',
+    }
 }));
 
 const AppHeader = () => {
@@ -49,7 +57,7 @@ const AppHeader = () => {
         <AppBar position="static" className={classes.root}>
             <Toolbar>
                 <Typography variant="h6" className={classes.title} onClick={goToHomePage}>
-                        TODOAPP
+                    TODOAPP
                 </Typography>
                 {!currentUser && <Button color="inherit">Login</Button>}
                 {!!currentUser &&
@@ -70,12 +78,19 @@ const AppHeader = () => {
                         onClose={handleClose}
                     >
                         <div style={{padding: "8px"}}>
-                            <Typography variant="h6">Signed in as: {currentUser.email} </Typography>
+                            {currentUser.displayName
+                                ?
+                                <Typography variant="h6"><img src={currentUser.photoURL}
+                                                              className={classes.profileImage}/>{currentUser.displayName} </Typography>
+                                :
+                                <Typography variant="h6">Signed in as: {currentUser.email} </Typography>
+                            }
                         </div>
+                        <Divider/>
                         <MenuItem onClick={goToDonePage}>Show done items</MenuItem>
                         <MenuItem onClick={signOut}>Log out</MenuItem>
                     </Menu>
-                    </React.Fragment>
+                </React.Fragment>
                 }
             </Toolbar>
         </AppBar>

@@ -7,6 +7,8 @@ import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
+import {signInWithGoogle} from "./firebase";
+import {Typography} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -49,6 +51,7 @@ const Login = ({history}) => {
         return <Redirect to="/"/>;
     }
 
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline/>
@@ -86,7 +89,20 @@ const Login = ({history}) => {
                         Sign In
                     </Button>
                 </form>
+                <Typography variant={"body1"}>or</Typography>
+                <Button
+                    onClick={() => {
+                        signInWithGoogle();
+                    }}
+                    fullWidth
+                    variant="contained"
+                    className={classes.submit}
+                    color="primary"
+                >
+                    Sign In with Google
+                </Button>
             </div>
+
 
         </Container>
     );
