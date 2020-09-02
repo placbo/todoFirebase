@@ -157,7 +157,7 @@ const MainPage = () => {
                                                           checkedIcon={<Favorite/>}
                                                           onClick={(e) => toggleFavorite(id, e)} name="checked"/>
                                             </ListItemIcon>
-                                            <ListItemIcon style={{}} className="drag-handle" style={{minWidth: "0", padding:"1rem"}}>
+                                            <ListItemIcon className="drag-handle" style={{minWidth: "0", padding:"1rem"}}>
                                                 <DragHandleIcon/>
                                             </ListItemIcon>
                                         </ListItemSecondaryAction>
