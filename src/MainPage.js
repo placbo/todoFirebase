@@ -152,12 +152,12 @@ const MainPage = () => {
                                         <EditableTextField value={itemTitle} id={id}
                                                            updateItemTitle={(value, id) => updateItemTitle(value, id)}/>
                                         <ListItemSecondaryAction>
-                                            <ListItemIcon>
+                                            <ListItemIcon style={{minWidth: "0"}}>
                                                 <Checkbox checked={isFavorite} icon={<FavoriteBorder/>}
                                                           checkedIcon={<Favorite/>}
                                                           onClick={(e) => toggleFavorite(id, e)} name="checked"/>
                                             </ListItemIcon>
-                                            <ListItemIcon style={{minWidth: "0"}} className="drag-handle">
+                                            <ListItemIcon style={{}} className="drag-handle" style={{minWidth: "0", padding:"1rem"}}>
                                                 <DragHandleIcon/>
                                             </ListItemIcon>
                                         </ListItemSecondaryAction>
