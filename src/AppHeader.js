@@ -51,7 +51,10 @@ const AppHeader = () => {
         setAnchorEl(null);
     };
 
-    const signOut = () => app.auth().signOut();
+    const signOut = () => {
+        app.auth().signOut();
+        history.push("/");
+    }
 
     return (
         <AppBar position="static" className={classes.root}>
