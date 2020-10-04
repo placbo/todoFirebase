@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
   card: {
     width: '800px',
     minWidth: '300px',
+    overflow: 'hidden',
   },
   input: {
     marginLeft: theme.spacing(1),
@@ -148,7 +149,7 @@ const MainPage = () => {
                 .map(({ id, isFavorite, itemTitle }) => {
                   return (
                     <Draggable key={id}>
-                      <ListItem style={{ height: '3rem' }}>
+                      <ListItem style={{ height: '3rem', padding: '0' }}>
                         <ListItemIcon>
                           <IconButton onClick={(e) => toggleItemDone(id, e)}>
                             <CheckBoxOutlineBlankIcon />

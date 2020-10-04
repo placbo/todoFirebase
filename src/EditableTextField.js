@@ -11,12 +11,15 @@ const EditableTextField = ({ value, id, updateItemTitle }) => {
 
   const useStyles = makeStyles({
     textView: {
-      width: '80%',
+      width: '50%',
+      textOverflow: 'ellipsis',
       cursor: 'pointer',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
       display: editMode ? 'none' : '',
     },
     inputView: {
-      width: '80%',
+      width: '50%',
       display: editMode ? '' : 'none',
     },
   });
