@@ -40,9 +40,6 @@ const AppHeader = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const goToDonePage = () => {
-    history.push('/done');
-  };
   const goToHomePage = () => {
     history.push('/');
   };
@@ -51,8 +48,12 @@ const AppHeader = () => {
   };
 
   const signOut = () => {
-    app.auth().signOut();
-    history.push('/');
+    app
+      .auth()
+      .signOut()
+      .then(() => {
+        history.push('/');
+      });
   };
 
   return (
@@ -64,12 +65,7 @@ const AppHeader = () => {
         {!currentUser && <Button color="inherit">Login</Button>}
         {!!currentUser && (
           <React.Fragment>
-            <IconButton
-              className={classes.menuButton}
-              color="inherit"
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleClick}>
+            <IconButton color="inherit" aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
               <MenuIcon />
             </IconButton>
             <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={!!anchorEl} onClose={handleClose}>
@@ -84,7 +80,6 @@ const AppHeader = () => {
                 )}
               </div>
               <Divider />
-              <MenuItem onClick={goToDonePage}>Show done items</MenuItem>
               <MenuItem onClick={signOut}>Log out</MenuItem>
             </Menu>
           </React.Fragment>

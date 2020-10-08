@@ -1,9 +1,28 @@
 import firebase from './firebase';
 import 'firebase/firestore';
 
-const collectionName = 'todoLists';
+// export const getTodoListsForUser = (userId) => {
+//   if (process.env.REACT_APP_USE_MOCK === 'true') {
+//     return new Promise((resolve, reject) => {
+//       let MOCK_DATA = ['list1', 'list2'];
+//       console.log('Mock retrieving list');
+//       resolve(MOCK_DATA);
+//     });
+//   }
+//   let list = [];
+//   firebase
+//     .firestore()
+//     .collection(userId)
+//     .get()
+//     .then(function (querySnapshot) {
+//       querySnapshot.forEach(function (doc) {
+//         list.push(doc.id);
+//       });
+//     });
+//   return list;
+// };
 
-export const getTodoForUser = (userId) => {
+export const getTodoForUser = (userId, listId) => {
   if (process.env.REACT_APP_USE_MOCK === 'true') {
     return new Promise((resolve, reject) => {
       let MOCK_DATA = [
@@ -26,23 +45,23 @@ export const getTodoForUser = (userId) => {
   }
   return firebase
     .firestore()
-    .collection(collectionName)
-    .doc(userId)
+    .collection(userId)
+    .doc(listId)
     .get()
     .then((doc) => {
-      return doc.data().tasks;
+      return doc.data();
     });
 };
 
-export const setTodoForUser = (userId, tasks) => {
+export const setTodoForUser = (userId, listId, tasks) => {
   if (process.env.REACT_APP_USE_MOCK === 'true') {
     console.log('Mock saving list');
     return;
   }
   return firebase
     .firestore()
-    .collection(collectionName)
-    .doc(userId)
+    .collection(userId)
+    .doc(listId)
     .set({ tasks: tasks })
     .then(() => {
       console.log('Document successfully written!');
