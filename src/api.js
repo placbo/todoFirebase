@@ -1,26 +1,26 @@
 import firebase from './firebase';
 import 'firebase/firestore';
 
-// export const getTodoListsForUser = (userId) => {
-//   if (process.env.REACT_APP_USE_MOCK === 'true') {
-//     return new Promise((resolve, reject) => {
-//       let MOCK_DATA = ['list1', 'list2'];
-//       console.log('Mock retrieving list');
-//       resolve(MOCK_DATA);
-//     });
-//   }
-//   let list = [];
-//   firebase
-//     .firestore()
-//     .collection(userId)
-//     .get()
-//     .then(function (querySnapshot) {
-//       querySnapshot.forEach(function (doc) {
-//         list.push(doc.id);
-//       });
-//     });
-//   return list;
-// };
+export const getTodoListsForUser = (userId) => {
+  if (process.env.REACT_APP_USE_MOCK === 'true') {
+    return new Promise((resolve, reject) => {
+      let MOCK_DATA = ['list1', 'list2'];
+      console.log('Mock retrieving list');
+      resolve(MOCK_DATA);
+    });
+  }
+  let list = [];
+  firebase
+    .firestore()
+    .collection(userId)
+    .get()
+    .then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        list.push(doc.id);
+      });
+    });
+  return list;
+};
 
 export const getTodoForUser = (userId, listId) => {
   if (process.env.REACT_APP_USE_MOCK === 'true') {
