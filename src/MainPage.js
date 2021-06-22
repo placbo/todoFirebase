@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './Auth';
-import { getTodoForUser, setTodoForUser } from './api';
+import { getTodoForUser, getTodoListsForUser, setTodoForUser } from './api';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItem from '@material-ui/core/ListItem';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -18,8 +18,9 @@ import { Favorite, FavoriteBorder } from '@material-ui/icons';
 import AppHeader from './AppHeader';
 import TextField from '@material-ui/core/TextField';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
@@ -50,41 +51,55 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MainPage = () => {
-  const DEFAULT_LIST = 'vN7e392zKXgAC4RLL4Fp';
+  //let DEFAULT_LIST = 'vN7e392zKXgAC4RLL4Fp';
 
+  const [currentTodoList, setCurrentTodoList] = useState('');
   const [newItemTitle, setNewItemTitle] = useState('');
   const [items, setItems] = useState([]);
-  const [name, setName] = useState('');
-  const [waitForApi, setWaitForApi] = useState(false);
+  const [todoLists, setTodoLists] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { currentUser } = useContext(AuthContext);
   const [allChangesSaved, setAllChangesSaved] = useState(true);
   const classes = useStyles();
 
+  useEffect(() => {
+    setLoading(true);
+    getTodoListsForUser(currentUser.email).then((list) => {
+      if (list && list.length > 0) {
+        setTodoLists(list);
+        setCurrentTodoList(list[0]);
+      }
+      setLoading(false);
+    });
+  }, [currentUser.email]);
+
   //Trigger (get list) on logged in user
   useEffect(() => {
-    setWaitForApi(true);
-    getTodoForUser(currentUser.email, DEFAULT_LIST)
-      .then((data) => {
-        console.log('Fetched: ', data);
-        data.name && setName(data.name);
-        data.tasks && setItems(data.tasks);
-      })
-      .catch((error) => {
-        console.log('Failed to load todo-list', error);
-      })
-      .finally(() => {
-        setWaitForApi(false);
-      });
-  }, [currentUser.email]);
+    setLoading(true);
+    currentTodoList.length > 0 &&
+      getTodoForUser(currentUser.email, currentTodoList)
+        .then((data) => {
+          console.log('Fetched: ', data);
+          data.tasks && setItems(data.tasks);
+        })
+        .catch((error) => {
+          console.log('Failed to load todo-list', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+  }, [currentUser.email, currentTodoList]);
 
   //Trigger (save list) on list change
   useEffect(() => {
     if (!allChangesSaved) {
       console.log(items);
-      setTodoForUser(currentUser.email, DEFAULT_LIST, items);
-      setAllChangesSaved(true);
+      setTodoForUser(currentUser.email, currentTodoList, items).then(() => {
+        setAllChangesSaved(true);
+      });
+      //TODO: try catch
     }
-  }, [items, allChangesSaved, currentUser.email]);
+  }, [items, allChangesSaved, currentUser.email, currentTodoList]);
 
   const addItem = (e) => {
     e.preventDefault();
@@ -154,12 +169,15 @@ const MainPage = () => {
     setAllChangesSaved(false);
   };
 
+  const handleChangeSelectedTodoList = (event) => {
+    setCurrentTodoList(event.target.value);
+  };
+
   return (
     <>
-      <AppHeader />
+      <AppHeader todoLists={todoLists} onchange={handleChangeSelectedTodoList} currentTodoList={currentTodoList} />
       <div className={classes.root}>
         <div className={classes.card}>
-          <p>{name}</p>
           <form style={{ textAlign: 'center' }} onSubmit={addItem}>
             <TextField
               className={classes.input}
@@ -189,10 +207,10 @@ const MainPage = () => {
                 .map(({ id, isFavorite, itemTitle }) => {
                   return (
                     <Draggable key={id}>
-                      <ListItem style={{ height: '3rem', padding: '0' }}>
+                      <ListItem style={{ height: '3rem', padding: '1rem' }}>
                         <ListItemIcon>
                           <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                            <CheckBoxOutlineBlankIcon />
+                            <CheckCircleOutlineIcon />
                           </IconButton>
                         </ListItemIcon>
                         <EditableTextField
@@ -228,7 +246,7 @@ const MainPage = () => {
                     <ListItem key={id} style={{ height: '3rem' }}>
                       <ListItemIcon>
                         <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                          <CheckBoxIcon />
+                          <CheckCircleIcon />
                         </IconButton>
                       </ListItemIcon>
                       <Typography variant="body1" style={{ textDecoration: 'line-through' }}>
@@ -252,9 +270,9 @@ const MainPage = () => {
             </div>
           </Container>
 
-          {waitForApi && <pre>fetching data ...</pre>}
+          {loading && <pre>fetching data ...</pre>}
 
-          <pre>{JSON.stringify(items, undefined, 2)}</pre>
+          {/*<pre>{JSON.stringify(items, undefined, 2)}</pre>*/}
         </div>
       </div>
     </>

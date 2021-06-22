@@ -12,14 +12,17 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import { useHistory } from 'react-router';
 import { Divider } from '@material-ui/core';
+import Select from '@material-ui/core/Select';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.primary,
   },
   title: {
-    flexGrow: 1,
     cursor: 'pointer',
+  },
+  toolbar: {
+    justifyContent: 'space-between',
   },
   profileImage: {
     borderRadius: '50%',
@@ -30,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AppHeader = () => {
+const AppHeader = ({ todoLists, onchange, currentTodoList }) => {
   const history = useHistory();
   const classes = useStyles();
   const { currentUser } = useContext(AuthContext);
@@ -58,16 +61,37 @@ const AppHeader = () => {
 
   return (
     <AppBar position="static" className={classes.root}>
-      <Toolbar>
+      <Toolbar className={classes.toolbar}>
         <Typography variant="h6" className={classes.title} onClick={goToHomePage}>
           TODOAPP
         </Typography>
         {!currentUser && <Button color="inherit">Login</Button>}
         {!!currentUser && (
-          <React.Fragment>
+          <>
+            <div>
+              {todoLists.length > 0 && (
+                <Select
+                  fullWidth
+                  style={{ width: '10rem', backgroundColor: '#ffffff' }}
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={currentTodoList}
+                  variant="outlined"
+                  onChange={onchange}>
+                  {todoLists.map((listItem) => {
+                    return (
+                      <MenuItem key={listItem} value={listItem}>
+                        {listItem}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              )}
+            </div>
             <IconButton color="inherit" aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
               <MenuIcon />
             </IconButton>
+
             <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={!!anchorEl} onClose={handleClose}>
               <div style={{ padding: '8px' }}>
                 {currentUser.displayName ? (
@@ -82,7 +106,7 @@ const AppHeader = () => {
               <Divider />
               <MenuItem onClick={signOut}>Log out</MenuItem>
             </Menu>
-          </React.Fragment>
+          </>
         )}
       </Toolbar>
     </AppBar>
