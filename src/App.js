@@ -6,6 +6,7 @@ import PrivateRoute from './PrivateRoute';
 import MainPage from './MainPage';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
+import UnauthorisedPage from './UnauthorisedPage';
 
 const theme = createMuiTheme({
   palette: {
@@ -25,6 +26,7 @@ const App = () => {
         <Router>
           <PrivateRoute exact path="/" component={MainPage} />
           <Route exact path="/login" component={Login} />
+          <Route exact path="/unauthorised" component={UnauthorisedPage} />
         </Router>
       </AuthProvider>
     </ThemeProvider>

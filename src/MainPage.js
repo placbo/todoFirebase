@@ -12,12 +12,10 @@ import DragHandleIcon from '@material-ui/icons/DragHandle';
 import { Divider, Typography } from '@material-ui/core';
 import { v4 as uuidv4 } from 'uuid';
 import EditableTextField from './EditableTextField';
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import Checkbox from '@material-ui/core/Checkbox';
 import { Favorite, FavoriteBorder } from '@material-ui/icons';
 import AppHeader from './AppHeader';
 import TextField from '@material-ui/core/TextField';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -38,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   actionLine: {
     padding: '5px',
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   input: {
     marginLeft: theme.spacing(1),
@@ -51,9 +49,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MainPage = () => {
-  //let DEFAULT_LIST = 'vN7e392zKXgAC4RLL4Fp';
-
-  const [currentTodoList, setCurrentTodoList] = useState('');
+  const [currentTodoList, setCurrentTodoList] = useState();
   const [newItemTitle, setNewItemTitle] = useState('');
   const [items, setItems] = useState([]);
   const [todoLists, setTodoLists] = useState([]);
@@ -63,37 +59,44 @@ const MainPage = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    setLoading(true);
-    getTodoListsForUser(currentUser.email).then((list) => {
-      if (list && list.length > 0) {
-        setTodoLists(list);
-        setCurrentTodoList(list[0]);
+    const loadListsForCurrentList = async () => {
+      try {
+        setLoading(true);
+        let result = await getTodoListsForUser(currentUser.email);
+        if (result && result.length > 0) {
+          setTodoLists(result);
+          setCurrentTodoList(result[0]);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+    loadListsForCurrentList().then();
   }, [currentUser.email]);
 
   //Trigger (get list) on logged in user
   useEffect(() => {
-    setLoading(true);
-    currentTodoList.length > 0 &&
-      getTodoForUser(currentUser.email, currentTodoList)
-        .then((data) => {
-          console.log('Fetched: ', data);
-          data.tasks && setItems(data.tasks);
-        })
-        .catch((error) => {
-          console.log('Failed to load todo-list', error);
-        })
-        .finally(() => {
+    const loadTasksForCurrentList = async () => {
+      if (currentTodoList) {
+        try {
+          setLoading(true);
+          let result = await getTodoForUser(currentUser.email, currentTodoList);
+          if (result.tasks) setItems(result.tasks);
+        } catch (error) {
+          console.error('Failed to load todo-list', error);
+        } finally {
           setLoading(false);
-        });
+        }
+      }
+    };
+    loadTasksForCurrentList().then();
   }, [currentUser.email, currentTodoList]);
 
   //Trigger (save list) on list change
   useEffect(() => {
     if (!allChangesSaved) {
-      console.log(items);
       setTodoForUser(currentUser.email, currentTodoList, items).then(() => {
         setAllChangesSaved(true);
       });
@@ -103,16 +106,14 @@ const MainPage = () => {
 
   const addItem = (e) => {
     e.preventDefault();
-    console.log(items);
     let newItem = {
       itemTitle: newItemTitle,
       id: uuidv4(),
       isFavorite: false,
       isDone: false,
     };
-    setItems([...items, newItem]);
+    setItems([newItem, ...items]);
     setNewItemTitle('');
-    console.log(items);
     setAllChangesSaved(false);
   };
 
@@ -177,103 +178,104 @@ const MainPage = () => {
     <>
       <AppHeader todoLists={todoLists} onchange={handleChangeSelectedTodoList} currentTodoList={currentTodoList} />
       <div className={classes.root}>
-        <div className={classes.card}>
-          <form style={{ textAlign: 'center' }} onSubmit={addItem}>
-            <TextField
-              className={classes.input}
-              variant="outlined"
-              fullWidth
-              required
-              placeholder="Legg til en oppgave"
-              value={newItemTitle}
-              onChange={(e) => setNewItemTitle(e.currentTarget.value)}
-            />
-          </form>
-          <Container
-            onDrop={onDrop}
-            getChildPayload={(index) => items[index]}
-            dragHandleSelector=".drag-handle"
-            lockAxis="y"
-            dropPlaceholder={{
-              animationDuration: 150,
-              showOnTop: true,
-              className: 'cards-drop-preview',
-            }}>
-            {items &&
-              items
-                .filter(function (item) {
-                  return !item.isDone;
-                })
-                .map(({ id, isFavorite, itemTitle }) => {
-                  return (
-                    <Draggable key={id}>
-                      <ListItem style={{ height: '3rem', padding: '1rem' }}>
+        {currentTodoList && (
+          <div className={classes.card}>
+            <form style={{ textAlign: 'center' }} onSubmit={addItem}>
+              <TextField
+                className={classes.input}
+                variant="outlined"
+                fullWidth
+                required
+                placeholder="Legg til en oppgave"
+                value={newItemTitle}
+                onChange={(e) => setNewItemTitle(e.currentTarget.value)}
+              />
+            </form>
+            <Container
+              onDrop={onDrop}
+              getChildPayload={(index) => items[index]}
+              dragHandleSelector=".drag-handle"
+              lockAxis="y"
+              dropPlaceholder={{
+                animationDuration: 150,
+                showOnTop: true,
+                className: 'cards-drop-preview',
+              }}>
+              {items &&
+                items
+                  .filter(function (item) {
+                    return !item.isDone;
+                  })
+                  .map(({ id, isFavorite, itemTitle }) => {
+                    return (
+                      <Draggable key={id}>
+                        <ListItem style={{ height: '3rem', padding: '1rem' }}>
+                          <ListItemIcon>
+                            <IconButton onClick={(e) => toggleItemDone(id, e)}>
+                              <CheckCircleOutlineIcon />
+                            </IconButton>
+                          </ListItemIcon>
+                          <EditableTextField
+                            value={itemTitle}
+                            id={id}
+                            updateItemTitle={(value, id) => updateItemTitle(value, id)}
+                          />
+                          <ListItemSecondaryAction>
+                            <ListItemIcon style={{ minWidth: '0' }}>
+                              <Checkbox
+                                checked={isFavorite}
+                                icon={<FavoriteBorder />}
+                                checkedIcon={<Favorite />}
+                                onClick={(e) => toggleFavorite(id, e)}
+                                name="checked"
+                              />
+                            </ListItemIcon>
+                            <ListItemIcon className="drag-handle" style={{ minWidth: '0', padding: '1rem' }}>
+                              <DragHandleIcon />
+                            </ListItemIcon>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                        <Divider />
+                      </Draggable>
+                    );
+                  })}
+              <Divider />
+              <div className={classes.actionLine}>
+                <Button onClick={deleteAllDone} className={classes.deleteAllButton}>
+                  Remove finished
+                </Button>
+              </div>
+              {items &&
+                items
+                  .filter((item) => item.isDone)
+                  .map(({ id, itemTitle }) => {
+                    return (
+                      <ListItem key={id} style={{ height: '3rem' }}>
                         <ListItemIcon>
                           <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                            <CheckCircleOutlineIcon />
+                            <CheckCircleIcon />
                           </IconButton>
                         </ListItemIcon>
-                        <EditableTextField
-                          value={itemTitle}
-                          id={id}
-                          updateItemTitle={(value, id) => updateItemTitle(value, id)}
-                        />
+                        <Typography variant="body1" style={{ textDecoration: 'line-through' }}>
+                          {itemTitle}
+                        </Typography>
                         <ListItemSecondaryAction>
-                          <ListItemIcon style={{ minWidth: '0' }}>
-                            <Checkbox
-                              checked={isFavorite}
-                              icon={<FavoriteBorder />}
-                              checkedIcon={<Favorite />}
-                              onClick={(e) => toggleFavorite(id, e)}
-                              name="checked"
-                            />
-                          </ListItemIcon>
-                          <ListItemIcon className="drag-handle" style={{ minWidth: '0', padding: '1rem' }}>
-                            <DragHandleIcon />
+                          <ListItemIcon>
+                            <IconButton onClick={(e) => deleteItem(id, e)}>
+                              <DeleteIcon />
+                            </IconButton>
                           </ListItemIcon>
                         </ListItemSecondaryAction>
                       </ListItem>
-                      <Divider />
-                    </Draggable>
-                  );
-                })}
-            <Divider />
-            {items &&
-              items
-                .filter((item) => item.isDone)
-                .map(({ id, itemTitle }) => {
-                  return (
-                    <ListItem key={id} style={{ height: '3rem' }}>
-                      <ListItemIcon>
-                        <IconButton onClick={(e) => toggleItemDone(id, e)}>
-                          <CheckCircleIcon />
-                        </IconButton>
-                      </ListItemIcon>
-                      <Typography variant="body1" style={{ textDecoration: 'line-through' }}>
-                        {itemTitle}
-                      </Typography>
-                      <ListItemSecondaryAction>
-                        <ListItemIcon>
-                          <IconButton onClick={(e) => deleteItem(id, e)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </ListItemIcon>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  );
-                })}
+                    );
+                  })}
+            </Container>
 
-            <div className={classes.actionLine}>
-              <Button onClick={deleteAllDone} className={classes.deleteAllButton}>
-                Remove finished
-              </Button>
-            </div>
-          </Container>
+            {loading && <pre>fetching data ...</pre>}
 
-          {loading && <pre>fetching data ...</pre>}
-
-          {/*<pre>{JSON.stringify(items, undefined, 2)}</pre>*/}
-        </div>
+            {/*<pre>{JSON.stringify(items, undefined, 2)}</pre>*/}
+          </div>
+        )}
       </div>
     </>
   );

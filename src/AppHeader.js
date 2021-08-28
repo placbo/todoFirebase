@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { AuthContext } from './Auth';
 import app from './firebase';
@@ -65,29 +64,26 @@ const AppHeader = ({ todoLists, onchange, currentTodoList }) => {
         <Typography variant="h6" className={classes.title} onClick={goToHomePage}>
           TODOAPP
         </Typography>
-        {!currentUser && <Button color="inherit">Login</Button>}
-        {!!currentUser && (
+        {currentUser && (
           <>
-            <div>
-              {todoLists.length > 0 && (
-                <Select
-                  fullWidth
-                  style={{ width: '10rem', backgroundColor: '#ffffff' }}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={currentTodoList}
-                  variant="outlined"
-                  onChange={onchange}>
-                  {todoLists.map((listItem) => {
-                    return (
-                      <MenuItem key={listItem} value={listItem}>
-                        {listItem}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              )}
-            </div>
+            {todoLists.length > 0 && currentTodoList && (
+              <Select
+                fullWidth
+                style={{ width: '10rem', height: '2rem', backgroundColor: '#ffffff' }}
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={currentTodoList}
+                variant="outlined"
+                onChange={onchange}>
+                {todoLists.map((listItem) => {
+                  return (
+                    <MenuItem key={listItem} value={listItem}>
+                      {listItem}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            )}
             <IconButton color="inherit" aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
               <MenuIcon />
             </IconButton>

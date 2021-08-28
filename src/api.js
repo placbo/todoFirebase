@@ -1,10 +1,12 @@
 import firebase from './firebase';
 import 'firebase/firestore';
+import { PCB } from './PrivateRoute';
 
 export const getTodoListsForUser = async (userId) => {
   if (process.env.REACT_APP_USE_MOCK === 'true') {
     return ['list1', 'list2'];
   }
+  userId = PCB; //TODO!! remove override
   let listIds = [];
   await firebase
     .firestore()
@@ -12,22 +14,16 @@ export const getTodoListsForUser = async (userId) => {
     .get()
     .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        console.log(doc.data());
         listIds.push(doc.id);
       });
     })
     .catch((error) => {
-      console.log('Failed to load todo-list', error);
-    })
-    .finally(() => {
-      console.log('list!', listIds);
+      console.error('Failed to load todo-list', error);
     });
   return listIds;
 };
 
-export const getTodoForUser = (userId, listId) => {
-  console.log(userId);
-  console.log(listId);
+export const getTodoForUser = async (userId, listId) => {
   if (process.env.REACT_APP_USE_MOCK === 'true') {
     return new Promise((resolve, reject) => {
       let MOCK_DATA = {
@@ -49,10 +45,10 @@ export const getTodoForUser = (userId, listId) => {
       let MOCK_DATA2 = {
         tasks: [{ id: '1', itemTitle: 'TODO-item 1', isFavorite: true, isDone: false }],
       };
-      console.log('Mock retrieving list');
       listId === 'list1' ? resolve(MOCK_DATA) : resolve(MOCK_DATA2);
     });
   }
+  userId = PCB; //TODO!! remove override
   return firebase
     .firestore()
     .collection(userId)
@@ -65,16 +61,16 @@ export const getTodoForUser = (userId, listId) => {
 
 export const setTodoForUser = (userId, listId, tasks) => {
   if (process.env.REACT_APP_USE_MOCK === 'true') {
-    console.log('Mock saving list');
     return;
   }
+  userId = PCB; //TODO!! remove override
   return firebase
     .firestore()
     .collection(userId)
     .doc(listId)
     .set({ tasks: tasks })
     .then(() => {
-      console.log('Document successfully written!');
+      // console.log('Document successfully written!');
     })
     .catch((error) => {
       console.error('Error updating/creating document: ', error);
